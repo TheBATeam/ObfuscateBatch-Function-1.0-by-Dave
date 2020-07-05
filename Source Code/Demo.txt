@@ -1,0 +1,6 @@
+@Echo off
+cls
+
+Title A Simple Test of Obfuscation by TheBATeam - www.thebateam.org
+Echo. Hello World!
+pause >nul

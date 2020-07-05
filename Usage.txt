@@ -1,0 +1,99 @@
+Simply Run the 'Test.bat' file to have a look at the extra-ordinary working of the plugin.
+You'll see a new file created. Edit it with any editor and you'll see the diffrence in the original and the obfuscated file.
+
+visit www.thebateam.org for more. :)
+
+#TheBAteam
+
+-----------------------------------------------------------------------------------------------
+
+:: ObfuscateBatch.bat  [/M]  SourceFile  [OutputFile]
+::
+::  Create obfuscated batch file OutputFile from SourceFile.
+::
+::  Note - This script requires JREPL.BAT v6.7 or higher.
+::
+::  If OutputFile is undefined, then the output file is named the same as
+::  the base name of SourceFile, with _obfuscated appended, and the extension
+::  is preserved.
+::
+::  For example:
+::
+::    obfuscate MyFile.cmd
+::  
+::  creates:
+::
+::    MyFile_obfuscated.cmd
+::
+::  There are two steps to the obfuscation:
+::
+::    Step 1)
+::
+::      - Text of the form {:Preserved} is preserved
+::      - Text of the form {ROT13ObfuscatedText} has the ROT13 cipher applied
+::        to alpha characters A-Z and a-z
+::      - All other text is preserved
+::
+::    Step 2)       
+::
+::      - Text of the form {:Preserved} is preserved
+::      - Text of the form {<Preserved} is preserved
+::      - Labels :label are preserved
+::      - Escaped percents %% are preserved
+::      - "All arguments" %* is preserved
+::      - Numbered arguments like %2 are preserved (including modifiers)
+::      - All remaining lone percents % are preserved
+::      - All remaining characters between \x20-\x7E are encoded as %HiByte%,
+::        where HiByte represents an extended ASCII character between \xA1-\xFF
+::
+::    If the /M option is in effect, then text between { and }, or {: and },
+::    or {< and } can span multiple lines.
+::
+::  The source file should consist of pure ASCII - no extended ASCII allowed.
+::
+::  For optimal obfuscation, the source code should adhere to these rules:
+::
+::    - Labels should be enclosed in braces:
+::        :{Label}
+::        goto {Label}
+::        call :{Label}
+::
+::    - User defined variable names should be enclosed in braces:
+::        set "{VarName}=value"
+::        echo %{VarName}% or %{VarName}:find=replace%  etc.
+::        echo !{VarName}! or !{VarName}:find=replace!  etc.
+::
+::    - Standard "variable" names like %comspec%, %random%, etc. should NOT be
+::      enclosed in braces. Such variables will not be obfuscated. If possible,
+::      use delayed  expansion instead. For eample - !comspec!, !random!, etc.
+::      Variable names within delayed expansion are obfuscated.
+::
+::    - Text that should remain human readable within the resultant code should
+::      be enclosed in {: }
+::        {:This text is not obfuscated}
+::
+::    - Text that should have the ROT13 cipher applied, but not encoded as
+::      %HiByte%, should be enclosed in {< }
+::        {< This text has the ROT13 cipher applied only }
+::
+::    - Comments of the form %=Comment=% should be enclosed within braces
+::        %={ ROT13 will be applied to this comment }=%
+::
+::    - Remember to use /M if text between braces spans multiple lines
+::
+::  When the obfuscated code is run, the current code page is stored, and the
+::  code executes within a child cmd.exe process using code page 708. Any
+::  command line arguments are passed without changes as long as all poison
+::  characters are quoted. The use of escaped poison characters on the command
+::  line is complicated and therefore discouraged.
+::
+::  Upon termination, the code page is restored to the original value and the
+::  original environment is restored.
+::
+::  The use of code page 708 is somewhat arbitrary, except it is critical that
+::  there not exist any extended ASCII character pairs that are recognized by
+::  cmd.exe as upper/lower case pairs. Code page 708 happens to be the first
+::  encoding I tested that passes this test.
+::
+::  ObfuscateBatch.bat v1.0 was written by Dave Benham and originally posted at
+::  http://www.dostips.com/forum/viewtopic.php?f=3&t=7990&start=15#p53278
